@@ -1,0 +1,255 @@
+# vim: set filetype=ezproxy_user
+
+# http://www.oclc.org/support/services/ezproxy/documentation/usr/bb/authorization.en.html
+User abc*; Stop
+Deny -Inline Only users whose usernames start with abc are allowed to access EZproxy.
+/Deny 
+
+Group Default
+Course Law.*; Group +Law
+Course Medical.*; Group +Medical
+Course Law.*; Course Medical.*; Group +MedicalLaw
+Course -Literal -Role=Faculty *; Group +Faculty
+Portal -Role=Faculty *; Group +Faculty
+User -Literal -Role=Faculty *; Group +Faculty
+
+# http://www.oclc.org/support/services/ezproxy/documentation/usr/cas.en.html
+::CAS
+Debug
+LoginURL http://www.yourlib.org/cas/login
+ServiceValidateURL http://www.yourlib.org/cas/serviceValidate
+Group NULL
+Test -RE cas:group (Undergrad|Grad); Group +Student
+Test //*/cas:group Employees; Group +Employee
+Test /cas:authenticationSuccess/cas:groups/cas:group Staff; Group +Staff
+NoGroups; Deny unaffiliated.html
+/CAS
+
+::CASLogin=http://www.yourlib.org/cas/login,CASServiceValidate=http://www.yourlib.org/cas/serviceValidate
+
+# http://www.oclc.org/support/services/ezproxy/documentation/usr/common.en.html
+::Common
+Set hour = FormatDateTime("%H", now)
+Set timeOfDay = "afternoon"
+If hour < 12; Set timeOfDay = "morning"
+If hour >= 18; Set timeOfDay = "evening"
+Set greeting = "Good " . timeOfDay
+
+# Conditions
+IfAfter yyyy-mm-dd
+IfAuth -CS wildauth
+IfAuthenticated
+IfBefore yyyy-mm-dd
+IfCity -CS wildcity
+IfCountry -CS wildcountry
+IfDay day,day
+IfExpired
+IfGroupMember group1+group2
+IfHeader -CS header:wildvalue
+IfHttp
+IfHttps
+IfInvalid
+IfIP 127.0.0.1;10.0.0.0-10.255.255.255
+IfLanguage -CS wildlanguage
+IfMonth month,month
+IfNoGroups
+IfPassword -CS wildpassword
+IfReferer -CS wildreferer
+IfRegion -CS wildregion
+IfRefused
+IfTime start-end,start-end
+IfUnauthenticated
+IfURL -CS wildurl
+IfUser -CS wildusername
+IfUsrVar
+IfYear year,year
+
+# Directives / Actions
+Admin
+Audit -expr other
+Allow
+Banner filename.html
+Debug
+Deny -NoAudit filename.html
+Deny -NoAudit -Redirect http://www.yourlib.org/denypage.html
+DocsCustom dir
+Group +group1-group2
+Ignore
+Msg -expr message
+Stop
+Unknown
+UsrVar
+/Common
+
+# http://www.oclc.org/support/services/ezproxy/documentation/usr/draweb2.en.html
+::DRAWeb2
+URL http://draweb2.yourlib.org/Web2/tramp2.exe/log_in?SETTING_KEY=guest&screen=ezp1.html
+Type FT,PT,ST,FS
+Date DMY
+/DRAWeb2
+
+# http://www.oclc.org/support/services/ezproxy/documentation/usr/ftp.en.html
+::ftp=ftpserv.mylib.org
+
+::group=General+Legal
+
+# http://www.oclc.org/support/services/ezproxy/documentation/usr/iii.en.html
+::III
+PartialNameMatch
+Password pass
+IfRefused; Audit foo
+Not IfUser -RE [0-9]+; Stop
+Host iii.mylib.org
+IfRefused; Deny irefused.htm
+IfExpired; Deny iexpired.htm
+IfUnauthenticated; Stop
+IfType 100,105,110; Stop
+Deny itype.htm
+/III
+
+# http://www.oclc.org/support/services/ezproxy/documentation/usr/imap.en.html
+::imap=imapserv.mylib.org
+::ssl,imap=imapserv.mylib.org
+
+# http://www.oclc.org/support/services/ezproxy/documentation/usr/insignia.en.html
+::Insignia
+URL http://insignia.yourlib.org/library/LoginPatron.aspx?App=MyAccount
+Unauthenticated; Stop
+/Insignia
+
+# http://www.oclc.org/support/services/ezproxy/documentation/usr/l4u.en.html
+::L4U
+URL http://l4u.yourlib.org/4dcgi/gen_2002/Lang=Def
+Unauthenticated; Stop
+/L4U
+
+# http://www.oclc.org/support/services/ezproxy/documentation/usr/ldap.en.html
+::LDAP
+BindUser CN=ezproxy,CN=users,DC=yourlib,DC=org
+BindPassword -Obscure verysecret
+URL ldap://ldapserv.yourlib.org/CN=users,DC=yourlib,DC=org?sAMAccountName?sub?(objectClass=person)
+DisableReferralChasing
+LDAPV2
+MemberAttribute foo
+MemberUser foo
+TestWithBind
+TestWithUser
+UseSearchFilterWhenReadingAttributes
+Set session:uid = auth:uid
+IfUnauthenticated; Stop
+IfTest eduPersonAffiliation staff; Stop
+IfTest -Wild eduPersonAffiliation alum; Deny alum.html
+IfMember CN=Law,CN=Users,DC=yourlib,DC=org; Group +Legal
+Group General
+Deny other.html
+/LDAP
+
+# http://www.oclc.org/support/services/ezproxy/documentation/usr/odbc.en.html
+::ODBC
+Debug
+DSN SomeSystemDSN
+DBUser SomeUser
+DBPassword SomePassword
+SQL USE SomeDatabase
+Parameter User
+Parameter Password
+SQL \
+SELECT 'Allow' \
+FROM auth \
+WHERE \
+user = ? AND \
+pass = ?
+/ODBC 
+
+# http://www.oclc.org/support/services/ezproxy/documentation/usr/pop.en.html
+::ssl,pop=popserv.mylib.org
+::pop= popserv.mylib.org,debug,noapop
+
+# http://www.oclc.org/support/services/ezproxy/documentation/usr/radius.en.html
+::radius=radserv.yourlib.org:1812,secret=linkup
+
+# http://www.oclc.org/support/services/ezproxy/documentation/usr/referer.en.html
+::referer=http://www.yourlib.org/login/* 
+
+# http://www.oclc.org/support/services/ezproxy/documentation/usr/shibboleth.en.html
+::Shibboleth
+IDP13 IDPEntityID
+WAYF13 https://localhost/blah
+WAYF13 -EntityID=EZproxyEntityiD https://localhost/blah
+IDP20 IDPEntityID
+DS20 https://localhost/blah
+IfAuth; DS20 -EntityID=EZproxyEntityID https://localhost/blah
+/Shibboleth
+
+# http://www.oclc.org/support/services/ezproxy/documentation/usr/hip.en.html
+::HIP
+Debug
+Profile profile
+OverviewSubmenu overview
+ProfileSubmenu info
+URL http://hip.yourlib.org/ipac20/ipac.jsp
+Unauthenticated; Stop
+IfTest Balance >n 5.00; Deny excessfines.htm
+IfTest ItemsLost >n 0; Deny itemslost.htm
+IfTest ItemsOverdue >n 0; Banner overdues.htm
+IfTest Location *Some Branch*; Stop
+Deny wrongbranch.htm
+/HIP
+
+# http://www.oclc.org/support/services/ezproxy/documentation/usr/sip.en.html
+::SIP,Debug
+Host siphost.yourlib.org
+Timeout 30
+Expect login:
+Send someuser\n
+LoginUsername sipuser
+LoginPassword sippass
+LoginLocation somewhere
+TerminalInstitution institution
+TerminalPassword termpass
+SIP
+SIP2
+/SIP
+
+# http://www.oclc.org/support/services/ezproxy/documentation/usr/file.en.html
+::file=myusers.txt
+
+# http://www.oclc.org/support/services/ezproxy/documentation/usr/ticket.en.html
+::Ticket
+AcceptGroups General+Medical+Legal
+TimeValid 10
+TimeOffset -60
+MD5 somekey
+Expired; Deny expired.html
+/Ticket
+
+# http://www.oclc.org/support/services/ezproxy/documentation/usr/tlc.en.html
+::TLC
+URL http://tlc.yourlib.org/TLCScripts/interpac.dll?PatronReview
+Unauthenticated; Stop
+/TLC
+
+# http://www.oclc.org/support/services/ezproxy/documentation/usr/domain.en.html
+::domain= your-domain
+
+# http://www.oclc.org/support/services/ezproxy/documentation/usr/vr.en.html
+virtref:secret:ip=192.168.1.15-192.168.1.20,login=vr.htm
+cgiuser:cgipass:cgi=http://auth.yourlib.org/cgi-bin/ezproxy.cgi?
+
+# http://www.oclc.org/support/services/ezproxy/documentation/usr/multiple.en.html
+::auth=d1,ftp=ftp.yourlib.org
+::auth=d2,domain=faculty-pdc
+chris:secret
+pat:code
+::imap=imap.yourlib.org 
+
+# http://www.oclc.org/support/services/ezproxy/documentation/usr/external.en.html
+::external=http://auth.yourlib.org/cgi-bin/check.cgi,post=user=^u&pass=^p,valid=+OK
+
+# http://www.oclc.org/support/services/ezproxy/documentation/usr/cgi.en.html
+::CGI=http://auth.yourlib.org/ezpauth.cgi?url=^R
+::CGI=http://auth.yourlib.org/ezpauth.cgi?url=^U&logup=^L
+
+user1::Deny
+user2::Deny
+user3::Deny
