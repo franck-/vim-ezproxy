@@ -10,16 +10,16 @@ syn case ignore
 
 syn match ezpComment '#.*$'
 
-syn region ezpRegionGlobalUsageLimit start=/\v^\s*UsageLimit/ end=/$/ contains=ezpGlobalUsageLimitDirective,ezpGlobalUsageLimitOption
+syn region ezpRegionGlobalUsageLimit start=/\v^\s*UsageLimit/ end=/$/ contains=ezpGlobalUsageLimitDirective,ezpGlobalUsageLimitOption oneline
 syn match ezpGlobalUsageLimitDirective '\v^\s*UsageLimit(\W|$)' contained
-syn keyword ezpGlobalUsageLimitOption -End -Enforce -Expires= -IgnoreAutoLoginIP -Interval= -Local -MB= -Transfers= contained
+syn keyword ezpGlobalUsageLimitOption -End -Enforce -IgnoreAutoLoginIP -Local contained
 syn match ezpGlobalUsageLimitOption /\v\W\-(Expires|Interval|MB|Transfers)=/ contained
 
-syn region ezpRegionDatabaseTitle start=/\v^\s*T(itle)?/ end=/$/ contains=ezpDatabaseTitleDirective,ezpDatabaseTitleOption
+syn region ezpRegionDatabaseTitle start=/\v^\s*T(itle)?/ end=/$/ contains=ezpDatabaseTitleDirective,ezpDatabaseTitleOption oneline
 syn match ezpDatabaseTitleDirective '\v^\s*T(itle)?(\W|$)' contained
 syn keyword ezpDatabaseTitleOption -hide contained
 
-syn region ezpRegionDatabaseURL start=/\v^\s*U(RL)?/ end=/$/ contains=ezpDatabaseURLDirective,ezpDatabaseURLOption
+syn region ezpRegionDatabaseURL start=/\v^\s*U(RL)?/ end=/$/ contains=ezpDatabaseURLDirective,ezpDatabaseURLOption oneline
 syn match ezpDatabaseURLDirective '\v^\s*U(RL)?(\W|$)' contained
 syn keyword ezpDatabaseURLOption -Append -Encoded -Form -Redirect -Refresh -RewriteHost contained
 
