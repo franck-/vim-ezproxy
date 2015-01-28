@@ -111,6 +111,7 @@ syn keyword ezpDirective SQL
 syn keyword ezpDirective Send
 syn keyword ezpDirective ServiceValidateURL
 syn keyword ezpDirective Set
+syn keyword ezpDirective SourceIP
 syn keyword ezpDirective Stop
 syn keyword ezpDirective TerminalInstitution
 syn keyword ezpDirective TerminalPassword
@@ -174,6 +175,7 @@ syn keyword ezpFunction Invalid
 syn keyword ezpFunction Join
 syn keyword ezpFunction LTrim
 syn keyword ezpFunction Left
+syn keyword ezpFunction Length
 syn keyword ezpFunction Lower
 syn keyword ezpFunction Mid
 syn keyword ezpFunction NoActiveGroups
